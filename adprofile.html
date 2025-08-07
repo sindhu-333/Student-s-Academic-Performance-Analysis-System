@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Profile</title>
+    <style>
+        /* Same styles from your reference, shortened here for clarity */
+        body { font-family: 'Segoe UI'; background-color: #f0f2f5; margin: 0; }
+        .profile-wrapper { width: 90%; max-width: 800px; margin: 40px auto; background: #fff; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        .top-bar { background: #272829; color: #fff; padding: 15px; text-align: center; }
+        .profile-content { display: flex; flex-wrap: wrap; }
+        .profile-sidebar { flex:1; min-width: 200px; background:#f7f9fc; text-align:center; padding:20px; }
+        .profile-sidebar img { width:150px; height:150px; border-radius:50%; object-fit:cover; border:4px solid #272829; margin-bottom:10px; }
+        .profile-form { flex:2; padding:20px; }
+        .form-group { margin-bottom:15px; }
+        .form-group label { display:block; font-weight:600; margin-bottom:5px; }
+        .form-group input, .form-group textarea { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; }
+        .button-container { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
+        button { padding:10px 20px; font-weight:600; background:#272829; color:#fff; border:none; border-radius:8px; cursor:pointer; }
+        button:hover { background:#555658; transform:translateY(-2px); }
+    </style>
+</head>
+<body>
+<div class="profile-wrapper">
+    <div class="top-bar"><h2>Admin Profile</h2></div>
+    <form id="adminForm" class="profile-content" enctype="multipart/form-data">
+        
+        <main class="profile-form">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+            <div class="form-group">
+                <label for="address">Address</label>
+                <textarea id="address" name="address" rows="3"></textarea>
+            </div>
+            <div class="button-container">
+                <button type="button" onclick="updateAdmin()">Update</button>
+                <button type="button" onclick="goBack()">Back</button>
+            </div>
+        </main>
+    </form>
+</div>
+
+<script>
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = () => { document.getElementById('profilePreview').src = reader.result; };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+function fetchAdmin() {
+    fetch('admin_profile.php')
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('name').value = data.name || '';
+        document.getElementById('email').value = data.email || '';
+        document.getElementById('phone').value = data.phone || '';
+        document.getElementById('address').value = data.address || '';
+        if (data.profile_image) {
+            document.getElementById('profilePreview').src = 'uploads/' + data.profile_image;
+        }
+    })
+    .catch(() => alert('Failed to load profile data.'));
+}
+
+function updateAdmin() {
+    const form = document.getElementById('adminForm');
+    const formData = new FormData(form);
+    
+    fetch('admin_profile.php', { method: 'POST', body: formData })
+    .then(res => res.json()) // Parse the response as JSON
+    .then(result => {
+        if (result.status === 'success') {
+            alert('Profile updated successfully!');
+        } else {
+            alert('Update failed: ' + (result.error || 'Unknown error'));
+        }
+    })
+    .catch(() => alert('Error updating profile.'));
+}
+
+
+function goBack() {
+    window.history.back();
+}
+
+window.onload = fetchAdmin;
+</script>
+</body>
+</html>

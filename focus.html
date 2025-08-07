@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Focus Required Students</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/dark-theme.css">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        #sidebar-placeholder {
+            width: 220px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+            transition: margin-left 0.3s ease;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 2px solid #333;
+        }
+
+        header .icons .material-icons {
+            font-size: 26px;
+            cursor: pointer;
+        }
+
+        header .icons .material-icons:hover {
+            color: #1abc9c;
+        }
+
+        .selection-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        select, #viewButton, #searchInput, #searchButton {
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+            padding: 10px;
+            margin: 5px;
+        }
+
+        #viewButton, #searchButton {
+            background-color: #3aac0a;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #viewButton:hover, #searchButton:hover {
+            background-color: #16a085;
+        }
+
+        #searchInput {
+            width: 250px;
+            outline: none;
+            transition: box-shadow 0.3s;
+        }
+
+        #searchInput:focus {
+            box-shadow: 0 0 5px #1abc9c;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        th {
+            background-color: #dff19e;
+            color: rgb(8, 8, 8);
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-placeholder"></div>
+    <!-- Main Content -->
+    <div class="content">
+    <!-- Header with home icon -->
+    <header>
+        <h2>Focus Required Students</h2>
+        <div class="icons">
+            <span class="material-icons" onclick="window.location.href='staff.html'">home</span>
+        </div>
+    </header>
+
+    <!-- Dropdown and View Button -->
+    <div class="selection-container">
+        <div>
+            <label for="classSelect"></label>
+            <select id="classSelect">
+                <option value="">-Select Class-</option>
+                <option value="8">Class 8</option>
+                <option value="9">Class 9</option>
+                <option value="10">Class 10</option>
+            </select>
+            <button id="viewButton" onclick="fetchFocusStudents()">View</button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <table class="student-table" id="focusTable">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Class</th>
+                <th>Max Marks</th>
+                <th>Obtained Marks</th>
+                <th>Percentage</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Default Row with "Marks not found" message -->
+            <tr>
+                <td colspan="6" id="noMarksMessage" style="text-align: center; color: red; font-weight: bold;">
+                    Marks not found. Please select a class to view marks.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <script>
+        fetch('side.html')
+          .then(res => res.text())
+          .then(data => {
+            document.getElementById('sidebar-placeholder').innerHTML = data;
+          });
+
+        function fetchFocusStudents() {
+            const classSelected = document.getElementById('classSelect').value;
+            const formData = new FormData();
+            formData.append("class", classSelected);
+
+            if (!classSelected) {
+                document.getElementById('noMarksMessage').innerText = 'Marks not found. Please select a class to view marks.';
+                document.getElementById('focusTable').style.display = 'table'; // Ensure the table is visible
+                return; // Don't proceed further if no class is selected
+            }
+
+            fetch("focusreq.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.querySelector('#focusTable tbody');
+                tableBody.innerHTML = '';  // Clear existing rows
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(student => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${student['student id']}</td>
+                            <td>${student['class']}</td>
+                            <td>${student['max marks']}</td>
+                            <td>${student['obtained marks']}</td>
+                            <td>${student['percentage']}</td>
+                            <td>${student['status']}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    document.getElementById('focusTable').style.display = 'table';  // Show the table if data exists
+                } else {
+                    document.getElementById('noMarksMessage').innerText = 'No students found below 40%';
+                    document.getElementById('focusTable').style.display = 'table';  // Show the table
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+        });
+    </script>
+</body>
+</html>

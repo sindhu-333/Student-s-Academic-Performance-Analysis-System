@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marks and Result</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> <!-- Add Bootstrap CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/dark-theme.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        #sidebar-placeholder {
+      width: 220px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      background-color: #303032;
+    }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-right button, .home-icon {
+            margin-left: 20px;
+            padding: 6px 12px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .header-right button:hover, .home-icon:hover {
+            background-color: #45a049;
+        }
+
+        .home-icon {
+            font-size: 30px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .content {
+            margin-left: 220px;
+      padding: 30px;
+      width: calc(100% - 220px);
+      transition: margin-left 0.3s ease;
+    }
+
+    .content.expanded {
+      margin-left: 50px;
+      width: calc(100% - 50px);
+    }
+
+        .select-class-section {
+            margin-bottom: 20px;
+            margin-top: 30px;
+            color:#303032;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .select-class-section select {
+            padding: 5px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 6px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .marks-table {
+            margin-top: 20px;
+        }
+
+        /* Updated Table Styling */
+        table {
+            width: 95%;
+            border-collapse: collapse;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 5px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #dff19e;
+            color: rgb(10, 10, 10);
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #e0e0e0;
+        }
+
+        td {
+            font-size: 10px;
+            color: #333;
+        }
+
+        .no-marks {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+        }
+
+        .edit-btn, .delete-btn {
+            cursor: pointer;
+            padding: 5px;
+            font-size: 10px;
+        }
+
+        .edit-btn {
+            color: blue;
+            background-color: #f6faf6;
+        }
+
+        .delete-btn {
+            color: red;
+            background-color: #f6faf6;
+        }
+
+        .update-btn {
+    padding: 2px 6px; /* Reduced padding */
+    font-size: 8px;   /* Smaller font size */
+    background-color: #f6faf6;
+    color: rgb(28, 118, 70);
+    border: none;
+    cursor: pointer;
+}
+
+
+        .update-btn:hover {
+            background-color: #45a049;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Dark theme adjustments */
+        body.dark-theme table tbody tr, 
+        body.dark-theme table td {
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-placeholder"></div>
+
+    <!-- Header Section -->
+     <!-- Content Section -->
+    <div class="content">
+    <header>
+        <div class="header-content">
+            <div class="logo"></div>
+            <div class="header-right">
+                <button onclick="window.location.href='result.html'">Result</button>
+                <button onclick="window.location.href='viewdetailmarks.html'">View detailed marks</button>
+                <a href="staff.html" class="home-icon">&#8962;</a> <!-- Home Icon -->
+            </div>
+        </div>
+    </header>
+
+    
+        <!-- Select Class and Search Bar Section -->
+        <div class="select-class-section">
+            <div>
+                
+                <select id="class-select" name="class">
+                    <option value="">-- Select Class --</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+
+                <button id="view-marks-btn">View Marks</button>
+            </div>
+        </div>
+
+        <!-- Marks Table -->
+        <div class="marks-table" id="marks-table" style="display: none;">
+            <table id="marks-table-content">
+                <thead>
+                    <tr>
+                        <th>Std ID</th>
+                        <th>First Language</th>
+                        <th>Second Language</th>
+                        <th>Third Language</th>
+                        <th>Maths</th>
+                        <th>Science</th>
+                        <th>Social Science</th>
+                        <th>Max Marks</th>
+                        <th>Total Marks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                
+                        <tr>
+                            <td colspan="10" id="marks-message" style="text-align: center; color: red; font-weight: bold;">
+                                Marks not found. Please select a class to view marks.
+                            </td>
+                        </tr>
+                
+                </tbody>
+            </table>
+            <div class="no-marks" id="no-marks" style="display: none;">
+                No marks available for this class.
+            </div>
+        </div>
+    </div>
+    <script>
+        fetch('side.html')
+          .then(res => res.text())
+          .then(data => {
+            document.getElementById('sidebar-placeholder').innerHTML = data;
+          });
+      </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initially, show the "Marks not found" message inside the table
+            $('#marks-table').show();
+            $('#marks-message').text('Marks not found. Please select a class to view marks.');
+    
+            // Fetch and display marks when "View Marks" button is clicked
+            $('#view-marks-btn').click(function() {
+                var selectedClass = $('#class-select').val();
+                
+                if (selectedClass === "") {
+                    // Show the "Marks not found" message when no class is selected
+                    $('#marks-message').text('Marks not found. Please select a class to view marks.');
+                    $('#marks-table-content tbody').html(`
+                        <tr>
+                            <td colspan="10" id="marks-message" style="text-align: center; color: red; font-weight: bold;">
+                                Marks not found. Please select a class to view marks.
+                            </td>
+                        </tr>
+                    `);
+                } else {
+                    // Fetch marks for the selected class
+                    $.get('fetch_marks.php', { class: selectedClass }, function(response) {
+                        console.log(response);  // Log the response to check if data is returned correctly
+    
+                        if (response == '') {
+                            // If no marks, show the "Marks not found" message
+                            $('#marks-message').text('Marks not found. Please select a class to view marks.');
+                        } else {
+                            // Hide the "Marks not found" message and show the data
+                            var rows = '';
+                            response = JSON.parse(response);  // Convert the response string back into an array if it's JSON
+    
+                            // Loop through each item in the response
+                            $(response).each(function(index, row) {
+                                rows += `
+                                    <tr data-id="${row.std_id}">
+                                        <td>${row.std_id}</td>
+                                        <td><input type="text" value="${row.first_language}" class="editable" disabled></td>
+                                        <td><input type="text" value="${row.second_language}" class="editable" disabled></td>
+                                        <td><input type="text" value="${row.third_language}" class="editable" disabled></td>
+                                        <td><input type="text" value="${row.maths}" class="editable" disabled></td>
+                                        <td><input type="text" value="${row.science}" class="editable" disabled></td>
+                                        <td><input type="text" value="${row.social_science}" class="editable" disabled></td>
+                                        <td>${row.max_marks}</td>
+                                        <td>${row.total_marks}</td>
+                                        <td>
+                                            <button class="edit-btn"><span class="glyphicon glyphicon-edit"></span> Edit</button>
+                                            <button class="delete-btn"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                                            <button class="update-btn" disabled><span class="glyphicon glyphicon-save"></span> Update</button>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+    
+                            // Insert the rows into the table
+                            $('#marks-table-content tbody').html(rows);
+                            // Attach click event handlers after inserting rows
+                                attachButtonHandlers();
+                        }
+                    });
+                }
+            });
+           // Enable editing when "Edit" button is clicked
+           $(document).on('click', '.edit-btn', function() {
+                var row = $(this).closest('tr');
+                row.find('input').prop('disabled', false);  // Enable input fields
+                row.find('.update-btn').prop('disabled', false);  // Enable update button
+            });
+
+            // Delete the selected marks
+            $(document).on('click', '.delete-btn', function() {
+                var row = $(this).closest('tr');
+                var std_id = row.data('id');
+                if (confirm('Are you sure you want to delete this record?')) {
+                    $.post('delete_marks.php', { std_id: std_id }, function(response) {
+                        if (response == 'success') {
+                            row.remove();
+                        }
+                    });
+                }
+            });
+
+            // Update the marks when "Update" button is clicked
+            $(document).on('click', '.update-btn', function () {
+    var row = $(this).closest('tr');
+    var std_id = row.data('id');
+
+    // Get max_marks from the 8th <td> (zero-based index)
+    var max_marks = row.children('td').eq(7).text().trim();
+
+    var updatedData = {
+        std_id: std_id,
+        first_language: row.find('input').eq(0).val(),
+        second_language: row.find('input').eq(1).val(),
+        third_language: row.find('input').eq(2).val(),
+        maths: row.find('input').eq(3).val(),
+        science: row.find('input').eq(4).val(),
+        social_science: row.find('input').eq(5).val(),
+        max_marks: max_marks
+    };
+
+    $.post('update_marks.php', updatedData, function (response) {
+        console.log(response);
+        if (response === 'success') {
+            row.find('input').prop('disabled', true);
+            row.find('.update-btn').prop('disabled', true);
+            alert("Marks updated successfully!");
+        } else {
+            alert("Error updating marks: " + response);
+        }
+    });
+});
+
+        });
+
+        // Define the attachButtonHandlers function to handle button actions
+        function attachButtonHandlers() {
+            // Remove existing event listeners to prevent duplicates
+            $(document).off('click', '.edit-btn');
+            $(document).off('click', '.delete-btn');
+            $(document).off('click', '.update-btn');
+
+            // Enable editing when "Edit" button is clicked
+            $(document).on('click', '.edit-btn', function() {
+                var row = $(this).closest('tr');
+                row.find('input').prop('disabled', false);  // Enable input fields
+                row.find('.update-btn').prop('disabled', false);  // Enable update button
+            });
+
+            // Delete the selected marks
+            $(document).on('click', '.delete-btn', function() {
+                var row = $(this).closest('tr');
+                var std_id = row.data('id');
+                if (confirm('Are you sure you want to delete this record?')) {
+                    $.post('delete_marks.php', { std_id: std_id }, function(response) {
+                        if (response == 'success') {
+                            row.remove();
+                        } else {
+                            alert('Failed to delete the record.');
+                        }
+                    });
+                }
+            });
+
+            // Update the marks when "Update" button is clicked
+            $(document).on('click', '.update-btn', function() {
+                var row = $(this).closest('tr');
+                var std_id = row.data('id');
+
+                // Get max_marks from the 8th <td> (zero-based index)
+                var max_marks = row.children('td').eq(7).text().trim();
+
+                var updatedData = {
+                    std_id: std_id,
+                    first_language: row.find('input').eq(0).val(),
+                    second_language: row.find('input').eq(1).val(),
+                    third_language: row.find('input').eq(2).val(),
+                    maths: row.find('input').eq(3).val(),
+                    science: row.find('input').eq(4).val(),
+                    social_science: row.find('input').eq(5).val(),
+                    max_marks: max_marks
+                };
+
+                // Prevent multiple alerts by ensuring only one event listener is active
+                $.post('update_marks.php', updatedData, function(response) {
+                    if (response === 'success') {
+                        row.find('input').prop('disabled', true);
+                        row.find('.update-btn').prop('disabled', true);
+                        alert('Marks updated successfully!');
+                    } else {
+                        alert('Error updating marks: ' + response);
+                    }
+                });
+            });
+        }
+
+        // Apply theme on page load based on local storage
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+        });
+    </script>
+    
+
+</body>
+</html>

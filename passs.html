@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password - Local Handz</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .forgot-password-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .forgot-password-form {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        .forgot-password-form h2 {
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            color: #333;
+            text-align: center;
+        }
+        .forgot-password-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: #333;
+        }
+        .forgot-password-form input,
+        .forgot-password-form select,
+        .forgot-password-form button {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .forgot-password-form button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .forgot-password-form button:hover {
+            background-color: #555;
+        }
+        .error-message,
+        .success-message {
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .error-message {
+            color: red;
+        }
+        .success-message {
+            color: green;
+        }
+        #otp-timer {
+            display: block;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="forgot-password-container">
+        <form class="forgot-password-form" id="forgot-password-form">
+            <h2>Forgot Password</h2>
+            <div id="message"></div>
+
+            <label for="reset-option">Reset Password Using</label>
+            <select id="reset-option" name="reset-option" required>
+                <option value="email">Email OTP</option>
+                <option value="security-question">Security Question</option>
+            </select>
+
+            <div id="email-section">
+                <label for="email">Enter Your Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                <button type="button" id="send-otp">Send OTP</button>
+            </div>
+
+            <div id="security-question-section" style="display: none;">
+                <label for="username">Enter Your Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                <button type="button" id="fetch-security-question">Get Security Question</button>
+                <label for="security-question">Your Security Question</label>
+                <input type="text" id="security-question" name="security-question" readonly>
+                <label for="email-readonly">Your Email</label>
+                <input type="email" id="email-readonly" name="email" readonly>
+                <label for="security-answer">Answer</label>
+                <input type="text" id="security-answer" name="security-answer" placeholder="Enter your answer" required>
+                <button type="button" id="verify-answer">Verify Answer</button>
+            </div>
+
+            <div id="otp-section" style="display: none;">
+                <label for="otp">Enter OTP</label>
+                <input type="text" id="otp" name="otp" placeholder="Enter the OTP sent to your email" required>
+                <span id="otp-timer"></span>
+                <button type="button" id="verify-otp">Verify OTP</button>
+                <button type="button" id="resend-otp" style="display:none;">Resend OTP</button>
+            </div>
+
+            <div id="reset-password-section" style="display: none;">
+                <label for="new-password">New Password</label>
+                <input type="password" id="new-password" name="new-password" placeholder="Enter your new password" required>
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your new password" required>
+                <button type="button" id="reset-password">Reset Password</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const resetOption = document.getElementById('reset-option');
+        const emailSection = document.getElementById('email-section');
+        const securityQuestionSection = document.getElementById('security-question-section');
+        const otpSection = document.getElementById('otp-section');
+        const resetPasswordSection = document.getElementById('reset-password-section');
+        const message = document.getElementById('message');
+        let otpTimer, otpTimeLeft = 0;
+
+        function showMessage(text, type = 'error') {
+            message.textContent = text;
+            message.className = type === 'success' ? 'success-message' : 'error-message';
+        }
+
+        function startOtpTimer() {
+            otpTimeLeft = 90;
+            document.getElementById('resend-otp').style.display = 'none';
+            updateOtpTimer();
+            otpTimer = setInterval(() => {
+                otpTimeLeft--;
+                updateOtpTimer();
+                if (otpTimeLeft <= 0) {
+                    clearInterval(otpTimer);
+                    document.getElementById('otp-timer').textContent = '';
+                    document.getElementById('resend-otp').style.display = 'inline-block';
+                }
+            }, 1000);
+        }
+
+        function updateOtpTimer() {
+            let min = Math.floor(otpTimeLeft / 60);
+            let sec = otpTimeLeft % 60;
+            document.getElementById('otp-timer').textContent = `Resend OTP in ${min}:${sec.toString().padStart(2, '0')}`;
+        }
+
+        resetOption.addEventListener('change', () => {
+            if (resetOption.value === 'email') {
+                emailSection.style.display = 'block';
+                securityQuestionSection.style.display = 'none';
+            } else {
+                emailSection.style.display = 'none';
+                securityQuestionSection.style.display = 'block';
+            }
+        });
+
+        document.getElementById('send-otp').addEventListener('click', async function () {
+            const email = document.getElementById('email').value.trim();
+            if (!email) return showMessage('Please enter your email.');
+            this.disabled = true;
+            try {
+                const response = await fetch('forgot-password.php?action=sendOtp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('OTP sent to your email.', 'success');
+                    otpSection.style.display = 'block';
+                    startOtpTimer();
+                } else {
+                    showMessage(data.error || 'Failed to send OTP.');
+                }
+            } catch (error) {
+                showMessage('An error occurred. Please try again.');
+            } finally {
+                this.disabled = false;
+            }
+        });
+
+        document.getElementById('resend-otp').addEventListener('click', function () {
+            document.getElementById('send-otp').click();
+        });
+
+        document.getElementById('verify-otp').addEventListener('click', async function () {
+            const otp = document.getElementById('otp').value.trim();
+            if (!otp) return showMessage('Please enter the OTP.');
+            this.disabled = true;
+            try {
+                const response = await fetch('forgot-password.php?action=verifyOtp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ otp })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('OTP verified. You can now reset your password.', 'success');
+                    resetPasswordSection.style.display = 'block';
+                    clearInterval(otpTimer);
+                    document.getElementById('otp-timer').textContent = '';
+                    document.getElementById('resend-otp').style.display = 'none';
+                } else {
+                    showMessage(data.error || 'Invalid OTP.');
+                }
+            } catch (error) {
+                showMessage('An error occurred. Please try again.');
+            } finally {
+                this.disabled = false;
+            }
+        });
+
+        document.getElementById('fetch-security-question').addEventListener('click', async function () {
+            const username = document.getElementById('username').value.trim();
+            if (!username) return showMessage('Please enter your username.');
+            try {
+                const response = await fetch('forgot_password.php?action=getSecurityQuestion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('security-question').value = data.question;
+                    document.getElementById('email-readonly').value = data.email;
+                    showMessage('');
+                } else {
+                    showMessage(data.error || 'Failed to fetch security question.');
+                }
+            } catch (error) {
+                showMessage('An error occurred. Please try again.');
+            }
+        });
+
+        document.getElementById('verify-answer').addEventListener('click', async function () {
+            const answer = document.getElementById('security-answer').value.trim();
+            if (!answer) return showMessage('Please enter your answer.');
+            try {
+                const response = await fetch('forgot-password.php?action=verifyAnswer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ answer })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('Answer verified. You can now reset your password.', 'success');
+                    resetPasswordSection.style.display = 'block';
+                } else {
+                    showMessage(data.error || 'Incorrect answer.');
+                }
+            } catch (error) {
+                showMessage('An error occurred. Please try again.');
+            }
+        });
+
+        document.getElementById('reset-password').addEventListener('click', async function () {
+            const newPassword = document.getElementById('new-password').value.trim();
+            const confirmPassword = document.getElementById('confirm-password').value.trim();
+            if (!newPassword || !confirmPassword) return showMessage('Please fill in all password fields.');
+            if (newPassword !== confirmPassword) return showMessage('Passwords do not match.');
+            this.disabled = true;
+            try {
+                const response = await fetch('forgot-password.php?action=resetPassword', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newPassword })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('Password reset successfully.', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    showMessage(data.error || 'Failed to reset password.');
+                }
+            } catch (error) {
+                showMessage('An error occurred. Please try again.');
+            } finally {
+                this.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

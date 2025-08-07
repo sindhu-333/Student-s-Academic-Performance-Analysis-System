@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <style>
+        body {
+            background-color: #e3d3e0; /* Light lilac/purple background */
+        }
+        .container {
+            width: 30%;
+            margin: 50px auto ;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom:10px;
+        }
+        input[type="submit"], input[type="button"], input[type="reset"] {
+            width: 30%; /* Make the buttons smaller and fit in one line */
+            padding: 10px;
+            background-color: #003366; /* Dark blue */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0; /* Add some space between the buttons */
+            display: inline-block; /* This will display buttons next to each other */
+       }
+        input[type="submit"]:hover, input[type="button"]:hover, input[type="reset"]:hover {
+            background-color: #00509E; /* Slightly lighter dark blue */
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Registration Form</h2>
+      
+
+
+        <form action="register.php" method="POST" onsubmit="return showSuccessMessage()">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Re-enter your password" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+
+            <label for="phno">Phone Number:</label>
+            <input type="text" id="phno" name="phno" placeholder="Enter your phone number" required>
+
+            <label for="hintQn">Select a Hint Question</label>
+            <select id="hintQn" name="hintQn" required>
+                <option value="motherMaidenName">What is your mother's maiden name?</option>
+                <option value="firstPet">What was the name of your first pet?</option>
+                <option value="firstSchool">What is the name of your first school?</option>
+                <option value="other">Other (Please specify)</option>
+            </select>
+            
+            <label for="customHint" id="customHintLabel" style="display: none;">Custom Hint</label>
+            <input type="text" id="customHint" name="customHint" placeholder="Enter your custom hint" style="display: none;" />
+        
+            <label for="hintAns">Hint Answer</label>
+            <input type="text" id="hintAns" name="hintAns" required />
+
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="student">Student</option>
+                <option value="staff">Staff</option>
+                
+            </select>
+
+            <!-- School ID field will show if the role is staff or admin -->
+            
+    
+           <input type="submit" value="Register"> 
+            <input type="reset" value="Clear">
+            <input type="button" value="Back to Login" onclick="window.location.href='log.html'">
+        </form>
+    </div>
+
+    <script>
+        // Show/hide the custom hint question input if "Other" is selected
+        document.getElementById('hintQn').addEventListener('change', function() {
+            const customHintField = document.getElementById('customHint');
+            const customHintLabel = document.getElementById('customHintLabel');
+            if (this.value === 'other') {
+                customHintField.style.display = 'block';
+                customHintLabel.style.display = 'block';
+            } else {
+                customHintField.style.display = 'none';
+                customHintLabel.style.display = 'none';
+            }
+        });
+
+        // Show/hide fields based on role selection
+        document.getElementById('role').addEventListener('change', function() {
+            const role = this.value;
+            if (role === 'student') {
+                document.getElementById('school_id_container').style.display = 'none';
+            } else if (role === 'staff' || role === 'admin') {
+                document.getElementById('school_id_container').style.display = 'block';
+            }
+        });
+
+        // Trigger change event on page load to set the initial state
+        document.getElementById('role').dispatchEvent(new Event('change'));
+
+        // Function to show the success popup on form submission
+        function showSuccessMessage() {
+            alert("Registration successful! Please log in.");
+            return true;
+            header("Location: log.html");
+              // Allow the form submission to continue
+        }
+
+        // Password validation with error message display
+        const passwordField = document.getElementById('password');
+        const passwordError = document.createElement('div');
+        passwordError.style.color = 'red';
+        passwordError.style.fontSize = '0.9em';
+        passwordError.style.marginTop = '-10px';
+        passwordError.style.marginBottom = '10px';
+        passwordField.insertAdjacentElement('afterend', passwordError);
+
+        passwordField.addEventListener('input', function() {
+            const password = this.value;
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!passwordPattern.test(password)) {
+                passwordError.textContent = 'Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character.';
+                this.setCustomValidity('Invalid password');
+            } else {
+                passwordError.textContent = '';
+                this.setCustomValidity('');
+            }
+        });
+
+        // Email validation with error message display
+        const emailField = document.getElementById('email');
+        const emailError = document.createElement('div');
+        emailError.style.color = 'red';
+        emailError.style.fontSize = '0.9em';
+        emailError.style.marginTop = '-10px';
+        emailError.style.marginBottom = '10px';
+        emailField.insertAdjacentElement('afterend', emailError);
+
+        emailField.addEventListener('input', function() {
+            const email = this.value;
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailPattern.test(email)) {
+                emailError.textContent = 'Please enter a valid email address.';
+                this.setCustomValidity('Invalid email');
+            } else {
+                emailError.textContent = '';
+                this.setCustomValidity('');
+            }
+        });
+
+        // Password and confirm password match validation
+        const confirmPasswordField = document.getElementById('confirm_password');
+        const confirmPasswordError = document.createElement('div');
+        confirmPasswordError.style.color = 'red';
+        confirmPasswordError.style.fontSize = '0.9em';
+        confirmPasswordError.style.marginTop = '-10px';
+        confirmPasswordError.style.marginBottom = '10px';
+        confirmPasswordField.insertAdjacentElement('afterend', confirmPasswordError);
+
+        confirmPasswordField.addEventListener('input', function() {
+            const password = passwordField.value;
+            const confirmPassword = this.value;
+            if (password !== confirmPassword) {
+                confirmPasswordError.textContent = 'Passwords do not match.';
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                confirmPasswordError.textContent = '';
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+
+</body>
+</html>

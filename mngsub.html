@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Subjects</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      background-color: #f5f7fa;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background-color: #303032;
+      color: #f5f0f0;
+      height: 70px;
+      padding: 0 20px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+    }
+
+    .header a {
+      color: #f5f0f0;
+      text-decoration: none;
+      font-size: 22px;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 30px;
+      width: calc(100% - 220px);
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-content.expanded {
+      margin-left: 50px;
+      width: calc(100% - 50px);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .controls select,
+    .controls button {
+      padding: 8px 12px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .controls button {
+      background-color: #50dd0a;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background-color: #3bb200;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    table th, table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    table th {
+      background-color: #f0f0f0;
+    }
+
+    tbody tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    .action-btn {
+      padding: 5px 10px;
+      margin-right: 5px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      background-color: #2196F3;
+      color: white;
+    }
+
+    .editable {
+  background-color: #f0f8ff;  /* Light blue background to indicate editing */
+  border: 1px solid #ccc;
+}
+
+    .delete-btn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .edit-btn:hover {
+      background-color: #0b7dda;
+    }
+
+    .delete-btn:hover {
+      background-color: #d32f2f;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Placeholder for Sidebar -->
+  <div id="sidebar-placeholder"></div>
+
+  <main class="main-content">
+    <div class="header">
+      <h1>Manage Subjects</h1>
+      <a href="admin.html" title="Go to Home"><i class="fas fa-home"></i></a>
+    </div>
+
+    <div class="controls">
+      <select id="classSelect">
+        <option value="">Select Class</option>
+        <option value="8">Class 8</option>
+        <option value="9">Class 9</option>
+        <option value="10">Class 10</option>
+      </select>
+      <button onclick="viewSubjects()">View</button>
+    </div>
+
+    <table id="subjectTable">
+      <thead>
+        <tr>
+          <th>Subject ID</th>
+          <th>Subject Name</th>
+          <th>Max Marks</th>
+          <th>Passing Marks</th>
+          <th>Class</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="6" style="text-align:center; color:#aaa;">No data yet. Please select a class and click view.</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    fetch('sidebar.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('sidebar-placeholder').innerHTML = data;
+      });
+
+
+  // Function to load subjects based on the selected class
+  function viewSubjects() {
+    const classVal = document.getElementById("classSelect").value;
+    const tbody = document.getElementById("subjectTable").querySelector("tbody");
+
+    if (!classVal) {
+        alert("Please select a class!");
+        return;
+    }
+
+    // Fetch subjects for the selected class
+    fetch('mngsubjct.php?class=' + classVal)
+        .then(response => response.text())  // Get the HTML table rows
+        .then(data => {
+            tbody.innerHTML = data;  // Insert the rows into the table body
+        })
+        .catch(error => {
+            alert('Error fetching subjects: ' + error);
+        });
+  }
+
+  // Function to handle subject editing (making cells editable)
+function editSubject(sub_id) {
+  const row = document.querySelector(`#subject_${sub_id}`);
+  const cells = row.querySelectorAll('td');
+  
+  // Make the cells editable (except the subject ID and Action column)
+  for (let i = 1; i < cells.length - 1; i++) {
+    cells[i].setAttribute('contenteditable', 'true');
+    cells[i].classList.add('editable');
+  }
+
+  // Add an event listener for 'Enter' key to save changes
+  row.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      // Disable further editing when Enter is pressed
+      for (let i = 1; i < cells.length - 1; i++) {
+        cells[i].removeAttribute('contenteditable');
+        cells[i].classList.remove('editable');
+      }
+      
+      // Get the updated values
+      const updatedSubName = cells[1].innerText;
+      const updatedMaxMarks = cells[2].innerText;
+      const updatedPassingMarks = cells[3].innerText;
+
+      // Send the updated data to the server
+      updateSubject(sub_id, updatedSubName, updatedMaxMarks, updatedPassingMarks);
+    }
+  });
+}
+
+// Function to update subject in the database
+function updateSubject(sub_id, sub_name, max_marks, passing_marks) {
+  fetch('mngsubjct.php?action=update', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: `sub_id=${sub_id}&sub_name=${encodeURIComponent(sub_name)}&max_marks=${encodeURIComponent(max_marks)}&passing_marks=${encodeURIComponent(passing_marks)}`
+  })
+  .then(response => response.text())
+  .then(message => {
+    alert(message); // Show the response message from PHP
+    if (message.includes("updated")) {
+      // Optionally, you can show a success message or highlight the updated row
+    }
+  })
+  .catch(error => {
+    alert('Error updating subject: ' + error);
+  });
+}
+
+// Function to handle subject deletion (no change)
+function deleteSubject(sub_id) {
+  if (confirm("Are you sure you want to delete subject ID: " + sub_id + "?")) {
+    fetch('mngsubjct.php?action=delete&sub_id=' + sub_id)
+      .then(response => response.text())
+      .then(message => {
+        alert(message); // Display deletion status
+        if (message.includes("deleted")) {
+          const row = document.querySelector(`#subject_${sub_id}`);
+          row.remove();
+        }
+      })
+      .catch(error => {
+        alert('Error deleting subject: ' + error);
+      });
+  }
+}
+
+</script>
+
+</body>
+</html>

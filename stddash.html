@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+    
+        .header {
+            width: 100%;
+            background-color: #303032;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    
+        .student-home-container {
+            display: flex;  /* Flex layout for side-by-side sidebar and main content */
+            height: calc(100vh - 60px); /* Adjust for header height */
+            width: 100%;
+        }
+    
+        .sidebar {
+            width: 250px;  /* Fixed width for sidebar */
+            background-color: #303032;
+            color: #faf7f7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+    
+        .sidebar img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+    
+        .sidebar h2 {
+            margin: 10px 0 5px;
+            font-size: 18px;
+        }
+    
+        .sidebar .nav-menu {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 0;
+        }
+    
+        .sidebar .nav-menu a,
+        .sidebar .logout-btn {
+            padding: 12px 20px;
+            text-align: left;
+            text-decoration: none;
+            color: #fff;
+            width: 60%;
+            border: none;
+            background: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-radius: 8px;
+        }
+    
+        .sidebar .nav-menu a:hover,
+        .sidebar .logout-btn:hover {
+            background-color: #50dd0a;
+            color: #333;
+            transform: translateX(8px);
+        }
+    
+        .sidebar .nav-menu a i,
+        .sidebar .logout-btn i {
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+    
+        .main-content {
+            flex-grow: 1;  /* Make the main content take up the rest of the space */
+            height: 100%;
+            position: relative;
+            background-image: url('h3.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #0b0b0b;
+            flex-direction: column;
+            overflow: hidden;
+        }
+    
+        .main-content::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;   /* Cover the full width of the main-content only */
+            height: 100%;  /* Cover the full height of the main-content only */
+            background: rgba(247, 247, 247, 0.6); /* Overlay to help with readability */
+            z-index: 2;
+        }
+    
+        .main-content h1,
+        .main-content p {
+            position: relative;
+            z-index: 3;
+        }
+        .cards-container {
+    display: flex;
+    width: 60%;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: relative;
+    z-index: 3;
+    justify-content: center;
+
+    
+}
+.card:hover {
+    transform: scale(1.1);
+}
+
+.card, .summary-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.summary-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.summary-box {
+    width: 90px;
+    height: 120px;
+    border-radius: 15px;
+    color: rgb(11, 10, 10);
+    text-align: center;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.summary-box:hover{
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.summary-box h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.summary-box p {
+    margin: 5px 0 0;
+    font-size: 14px;
+}
+
+.summary-box.marks {
+    background: #4da6ff; /* blue */
+}
+
+.summary-box.percentage {
+    background: #4dff88; /* green */
+}
+
+.summary-box.grade {
+    background: #ffc04d; /* orange */
+}
+
+.summary-box.status {
+    background: #ff6666; /* red */
+}
+
+.cards-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;  /* Center align cards */
+    width: 90%;  /* Full width */
+    gap: 10px;
+    margin-top: 20px; /* Space between student detail and summary cards */
+}
+
+.student-detail-card {
+    width: 80%;  /* Full width for the student details card */
+    display: flex;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    flex-direction: column;
+    align-items: left;
+    margin-bottom: 20px; /* Space below the student detail card */
+    color: #0b0b0b;
+}
+
+.student-detail-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.student-detail-card h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.student-detail-card p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+
+
+    </style>
+</head>
+<body>
+
+    <div class="header">Student Dashboard</div>
+
+    <div id="studentHomePage" class="student-home-container">
+        <div class="sidebar">
+            <img id="profileImage" src="https://via.placeholder.com/100" alt="Profile Image">
+            <h2 id="studentName">Welcome, Student!</h2>
+            <div class="nav-menu">
+                <a href="profile.html"><i class="material-icons">person</i> Profile</a>
+                <a href="viewmrk.html"><i class="material-icons">info</i> View Marks</a>
+                
+                <button class="logout-btn" onclick="logout()"><i class="material-icons">logout</i> Logout</button>
+            </div>
+        </div>
+    
+        <div class="main-content">
+           
+        </div>
+    </div>
+
+<script>
+    // Show student homepage if name exists
+    const studentHomePage = document.getElementById("studentHomePage");
+    const profileImage = document.getElementById("profileImage");
+    const studentName = document.getElementById("studentName");
+
+    window.onload = function() {
+    fetch('studhome.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                window.location.href = 'log.html';
+            } else {
+                studentHomePage.style.display = "flex";
+                studentName.textContent = 'Welcome, ' + data.name + '!';
+
+                if (data.profile_image && data.profile_image.trim() !== '') {
+                    profileImage.src = data.profile_image;
+                } else {
+                    profileImage.src = 'https://via.placeholder.com/100';
+                }
+
+                const mainContent = document.querySelector('.main-content');
+
+                let cardsHtml = '<div class="cards-container">';
+
+                // Adding student details card (Full width)
+                cardsHtml += `
+                    <div class="student-detail-card">
+                        <h3>Name:${data.name}</h3>
+                        <p>Class: ${data.class}</p>
+                        <p>Gender: ${data.gender}</p>
+                        <p>DOB: ${data.dob}</p>
+                        <p>Phone: ${data.phone}</p>
+                        <p>Email: ${data.email}</p>
+                    </div>
+                `;
+
+                // Adding the summary cards below the student detail card
+                const summary = data.summary;
+                cardsHtml += `
+                    <div class="summary-container">
+                        <div class="summary-box marks">
+                            <h2>${summary.total_marks}</h2>
+                            <p>Total Marks</p>
+                        </div>
+                        <div class="summary-box percentage">
+                            <h2>${summary.percentage}%</h2>
+                            <p>Percentage</p>
+                        </div>
+                        <div class="summary-box grade">
+                            <h2>${summary.grade}</h2>
+                            <p>Grade</p>
+                        </div>
+                        <div class="summary-box status">
+                            <h2>${summary.status}</h2>
+                            <p>Status</p>
+                        </div>
+                    </div>
+                `;
+
+                mainContent.innerHTML = cardsHtml;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            window.location.href = 'log.html';
+        });
+};
+
+
+    function logout() {
+        fetch('logout.php')
+            .then(() => window.location.href = 'log.html')
+            .catch(err => console.error('Logout failed:', err));
+    }
+</script>
+
+</body>
+</html>

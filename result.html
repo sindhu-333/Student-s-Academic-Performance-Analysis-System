@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Results</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/dark-theme.css">
+
+    <!-- Your Full CSS Style (pasted back exactly) -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        #sidebar-placeholder {
+            width: 220px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 2px solid #333;
+        }
+
+        header .icons {
+            display: flex;
+            align-items: center;
+        }
+
+        header .icons .material-icons {
+            font-size: 24px;
+            margin-left: 15px;
+            cursor: pointer;
+            color: white;
+        }
+
+        header .icons .material-icons:hover {
+            color: #1abc9c;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .selection-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .selection-container select, .selection-container button {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+        }
+
+        .selection-container button {
+            background-color: #3aac0a;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .selection-container button:hover {
+            background-color: #16a085;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .search-container input {
+            padding: 10px 40px 10px 10px;
+            font-size: 16px;
+            width: 250px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            border-color: #3aac0a;
+            box-shadow: 0 0 8px rgba(58, 172, 10, 0.3);
+        }
+
+        .search-container .material-icons {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #080808;
+            cursor: pointer;
+        }
+
+        .search-container button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #3aac0a;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #0c4712;
+        }
+
+        .table-container {
+            margin-top: 20px;
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: #f9f9f7;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: black;
+        }
+
+        th {
+            background-color: #dff19e;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e0e0e0;
+        }
+
+        .no-results {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Dark theme adjustments */
+        body.dark-theme table tbody tr, 
+        body.dark-theme table td {
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-placeholder"></div>
+
+<header>
+    <div>Result</div>
+    <div class="icons">
+        <a href="staff.html">
+            <span class="material-icons">home</span>
+        </a>
+    </div>
+</header>
+
+<div class="content">
+    <div class="selection-container">
+        <div>
+            
+            <select id="classSelect">
+                <option value="">-- Select Class --</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+            <button id="viewButton">View</button>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search by student ID">
+            <button id="searchButton">Search</button>
+        </div>
+    </div>
+
+    <table class="student-table" id="studentTable">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Class</th>
+                <th>Max Marks</th>
+                <th>Total Marks</th>
+                <th>Percentage</th>
+                <th>Grade</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Data from PHP will load here -->
+        </tbody>
+    </table>
+</div>
+<script>
+    fetch('side.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('sidebar-placeholder').innerHTML = data;
+      });
+</script>
+
+<script>
+    // Apply theme on page load based on local storage
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+    });
+</script>
+
+<script>
+    document.getElementById("viewButton").addEventListener("click", function () {
+        var selectedClass = document.getElementById("classSelect").value;
+        if (selectedClass === "") return alert("Please select a class");
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "studresult.php", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function () {
+            document.getElementById("tableBody").innerHTML = xhr.responseText;
+            document.getElementById("studentTable").style.display = "table";
+        };
+
+        xhr.send("class=" + encodeURIComponent(selectedClass));
+    });
+
+    document.getElementById("searchButton").addEventListener("click", function () {
+        var studentId = document.getElementById("searchInput").value;
+        if (studentId.trim() === "") return alert("Please enter student ID");
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "studresult.php", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function () {
+            document.getElementById("tableBody").innerHTML = xhr.responseText;
+            document.getElementById("studentTable").style.display = "table";
+        };
+
+        xhr.send("student_id=" + encodeURIComponent(studentId));
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<?php
+session_start();
+require_once 'conn.php'; // Assuming you have a separate DB config file
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $role = $_POST['role']; // The role might not be needed for this query, but keep it in case you want to use it for other purposes
+    $captcha_input = $_POST['captcha_input'];
+
+    // Validate Captcha
+    if ($captcha_input !== $_SESSION['captcha_code']) {
+        echo "Captcha doesn't match.";
+        exit;
+    }
+
+    // Query the database to check if the username and role match for a registered student
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND role = 'student'");
+    $stmt->bind_param("s", $username);  // Looking for the 'student' role only
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        // Verify the password
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+
+            // Redirect to the student dashboard
+            echo "Login successful!";
+            header('Location: student_home.php');
+            exit;  // Don't forget to exit after the header redirection
+        } else {
+            echo "Invalid password.";
+        }
+    } else {
+        echo "No registered student found with that username.";
+    }
+} else {
+    echo "Invalid request method.";
+}
+?>
+
+
+
+
+
+
+<?php
+session_start();
+require_once 'conn.php'; // Assuming you have a separate DB config file
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $role = $_POST['role']; // You may not need this if you only care about 'student'
+    $captcha_input = $_POST['captcha_input'];
+
+    // Validate Captcha
+    if ($captcha_input !== $_SESSION['captcha_code']) {
+        echo "Captcha doesn't match.";
+        exit;
+    }
+
+    // Query the database to check if the username and password match for a registered student
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND role = 'student'");
+    $stmt->bind_param("s", $username);  // Only looking for the 'student' role
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        // Verify the password
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+
+            // Redirect to the student dashboard
+            echo "Login successful!";
+            header('Location: student_home.php');
+            exit;  // Don't forget to exit after header redirection
+        } else {
+            echo "Invalid password.";
+        }
+    } else {
+        echo "No registered student found with that username.";
+    }
+} else {
+    echo "Invalid request method.";
+}
+?>
+

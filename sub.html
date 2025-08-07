@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Subjects</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/dark-theme.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        #sidebar-placeholder {
+            width: 220px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+            transition: margin-left 0.3s ease;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 2px solid #333;
+        }
+
+        header .icons .material-icons {
+            font-size: 26px;
+            cursor: pointer;
+        }
+
+        header .icons .material-icons:hover {
+            color: #1abc9c;
+        }
+
+        .select-class-section {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .select-class-section select {
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        .select-class-section button {
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+            padding: 10px;
+            background-color: #3aac0a;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .select-class-section button:hover {
+            background-color: #16a085;
+        }
+
+        .subject-table {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto 0;
+            border-collapse: collapse;
+            background: #f9f9f7;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+        }
+
+        th, td {
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: black;
+        }
+
+        th {
+            background-color: #dff19e;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e0e0e0;
+        }
+
+        .no-subjects {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+            display: none;
+        }
+
+        /* Dark theme adjustments */
+        body.dark-theme table tbody tr, 
+        body.dark-theme table td {
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-placeholder"></div>
+    <div class="content">
+    <!-- Header Section -->
+    <header>
+        <div>View Subjects</div>
+        <div class="icons">
+            <a href="staff.html"><span class="material-icons">home</span></a>
+        </div>
+    </header>
+
+    
+        <!-- Select Class and View Button -->
+        <div class="select-class-section">
+            <select id="class-select" name="class">
+                <option value="">-- Select Class --</option> 
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+            <button id="view-btn">View</button>
+        </div>
+
+        <!-- Table Section -->
+        <div class="subject-table" id="subject-table">
+            <table id="subject-table-content" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Subject ID</th>
+                        <th>Subject Name</th>
+                        <th>Max Marks</th>
+                        <th>Passing Marks</th>
+                        <th>Class</th>
+                        <th>Teacher ID</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="no-subjects" id="no-subjects" style="display: none;">
+                No subjects available for this class.
+            </div>
+        </div>
+    </div>
+    <script>
+        fetch('side.html')
+          .then(res => res.text())
+          .then(data => {
+            document.getElementById('sidebar-placeholder').innerHTML = data;
+          });
+      </script>
+
+<script>
+    fetch('side.html')
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById('sidebar-placeholder').innerHTML = data;
+        });
+
+    // Apply theme on page load based on local storage
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+    });
+
+    // Fetch subjects for the selected class from the backend
+    function fetchSubjects(classId) {
+        const tableContent = document.getElementById("subject-table-content");
+        const noSubjectsMessage = document.getElementById("no-subjects");
+        
+        const tbody = tableContent.getElementsByTagName('tbody')[0];
+        tbody.innerHTML = '';  // Clear previous rows
+
+        let url = 'subject.php';  // Default to fetching all subjects
+        
+        if (classId > 0) {
+            url = `subject.php?class=${classId}`;  // Fetch subjects for the selected class
+        }
+
+        fetch(url)
+            .then(response => response.text()) // We expect HTML, not JSON
+            .then(data => {
+                document.getElementById('subject-table').innerHTML = data;
+
+                if (data.includes("No subjects available")) {
+                    tableContent.style.display = "none";
+                    noSubjectsMessage.style.display = "block";
+                } else {
+                    tableContent.style.display = "table";
+                    noSubjectsMessage.style.display = "none";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching subjects:", error);
+            });
+    }
+
+    // Trigger subject fetching for the selected class on page load
+    document.addEventListener("DOMContentLoaded", function() {
+        const defaultClass = 0; // Set default class to 0 for all subjects
+        fetchSubjects(defaultClass);
+    });
+
+    // Handle view button click event
+    document.getElementById("view-btn").addEventListener("click", function() {
+        const classId = parseInt(document.getElementById("class-select").value);
+        fetchSubjects(classId);
+    });
+</script>
+
+    
+
+</body>
+</html>

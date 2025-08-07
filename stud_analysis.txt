@@ -1,0 +1,262 @@
+DROP TABLE IF EXISTS `admins`;
+CREATE TABLE IF NOT EXISTS `admins` (
+  `admin_id` int NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL,
+  `name` varchar(25) NOT NULL,
+  `email` varchar(55) DEFAULT NULL,
+  `hint_question` varchar(255) DEFAULT NULL,
+  `hint_answer` varchar(255) DEFAULT NULL,
+  `address` varchar(150) NOT NULL,
+  PRIMARY KEY (`admin_id`),
+  KEY `fkad` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `marks`
+--
+
+DROP TABLE IF EXISTS `marks`;
+CREATE TABLE IF NOT EXISTS `marks` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `std_id` int NOT NULL,
+  `class` int NOT NULL,
+  `first_language` int NOT NULL,
+  `second_language` int NOT NULL,
+  `third_language` int NOT NULL,
+  `maths` int NOT NULL,
+  `science` int NOT NULL,
+  `social_science` int NOT NULL,
+  `max_marks` int NOT NULL,
+  `total_marks` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unq` (`std_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `marks`
+--
+
+INSERT INTO `marks` (`id`, `std_id`, `class`, `first_language`, `second_language`, `third_language`, `maths`, `science`, `social_science`, `max_marks`, `total_marks`) VALUES
+(3, 18, 8, 98, 90, 96, 89, 80, 90, 300, 543);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `results`
+--
+
+DROP TABLE IF EXISTS `results`;
+CREATE TABLE IF NOT EXISTS `results` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `std_id` int NOT NULL,
+  `class` int NOT NULL,
+  `max_marks` int NOT NULL,
+  `total_marks` int NOT NULL,
+  `percentage` float NOT NULL,
+  `grade` varchar(2) NOT NULL,
+  `status` varchar(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `std_id` (`std_id`,`class`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `results`
+--
+
+INSERT INTO `results` (`id`, `std_id`, `class`, `max_marks`, `total_marks`, `percentage`, `grade`, `status`) VALUES
+(4, 17, 0, 0, 0, 0, '', ''),
+(5, 18, 8, 300, 100, 0, 'NC', 'fail');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `security`
+--
+
+DROP TABLE IF EXISTS `security`;
+CREATE TABLE IF NOT EXISTS `security` (
+  `sec_id` int NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL,
+  `username` varchar(25) NOT NULL,
+  `password` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `role` enum('admin','staff','student') NOT NULL,
+  PRIMARY KEY (`sec_id`),
+  KEY `fks` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `security`
+--
+
+INSERT INTO `security` (`sec_id`, `id`, `username`, `password`, `role`) VALUES
+(5, 7, 'sindhu03', '$2y$10$3ObJO5EZ02nkNZ.FTowBMOiLdWGGgfY3KFmzKFxwHeyzFB9mbFzXK', 'student'),
+(6, 8, 'varsha', '$2y$10$wQZIx3YigtQwUo3VROMgGudyre1/75NBjb..ElnWAqkCkRZOymliG', 'student');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `staff`
+--
+
+DROP TABLE IF EXISTS `staff`;
+CREATE TABLE IF NOT EXISTS `staff` (
+  `staff_id` int NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL,
+  `name` varchar(25) NOT NULL,
+  `phone` varchar(13) NOT NULL,
+  `email` varchar(55) DEFAULT NULL,
+  `gender` enum('Male','Female','Other') DEFAULT NULL,
+  `address` text,
+  `hint_question` varchar(255) DEFAULT NULL,
+  `hint_answer` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`staff_id`),
+  KEY `fkst` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `staff`
+--
+
+INSERT INTO `staff` (`staff_id`, `id`, `name`, `phone`, `email`, `gender`, `address`, `hint_question`, `hint_answer`) VALUES
+(1, 15, '', '9687543210', 'shalini1@gmail.com', NULL, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `students`
+--
+
+DROP TABLE IF EXISTS `students`;
+CREATE TABLE IF NOT EXISTS `students` (
+  `std_id` int NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL,
+  `username` varchar(25) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `dob` date DEFAULT NULL,
+  `class` int DEFAULT NULL,
+  `year` int DEFAULT NULL,
+  `gender` enum('Male','Female','Other') DEFAULT NULL,
+  `phone` varchar(13) NOT NULL,
+  `email` varchar(50) NOT NULL,
+  `address` text,
+  `parent_name` varchar(255) DEFAULT NULL,
+  `parent_phone_number` varchar(15) DEFAULT NULL,
+  `hint_question` varchar(255) DEFAULT NULL,
+  `hint_answer` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`std_id`),
+  KEY `fks` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `students`
+--
+
+INSERT INTO `students` (`std_id`, `id`, `username`, `full_name`, `dob`, `class`, `year`, `gender`, `phone`, `email`, `address`, `parent_name`, `parent_phone_number`, `hint_question`, `hint_answer`) VALUES
+(17, 36, 'sindhu3', 'sindhu b', '2004-09-03', 8, 2025, '', '9876543214', 'sin@gmial.com', 'abc', 'xyz', '9786543213', 'motherMaidenName', 'john'),
+(18, 37, 'ananya', 'ananya', '2009-09-08', 8, 2025, 'Male', '9876453219', 'a@gmail.com', 'asd', 'abc', '9876453219', 'motherMaidenName', 'john');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subjects`
+--
+
+DROP TABLE IF EXISTS `subjects`;
+CREATE TABLE IF NOT EXISTS `subjects` (
+  `sub_id` int NOT NULL,
+  `sub_name` varchar(100) NOT NULL,
+  `max_marks` int NOT NULL,
+  `passing_marks` int NOT NULL,
+  `staff_id` int NOT NULL,
+  `class` int NOT NULL,
+  PRIMARY KEY (`sub_id`),
+  KEY `fkstf` (`staff_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `subjects`
+--
+
+INSERT INTO `subjects` (`sub_id`, `sub_name`, `max_marks`, `passing_marks`, `staff_id`, `class`) VALUES
+(0, 'First language', 50, 13, 1, 8),
+(1, 'First language', 100, 35, 1, 9),
+(2, 'First language', 125, 40, 1, 10);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(25) NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `phno` varchar(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `email` varchar(45) DEFAULT NULL,
+  `role` enum('admin','staff','student') NOT NULL,
+  `school_id` int NOT NULL,
+  `hintQn` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `hintAns` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `password` (`password`)
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `phno`, `email`, `role`, `school_id`, `hintQn`, `hintAns`) VALUES
+(15, 'ShaliniN', '$2y$10$Jz0xs5PB7.oLfsiIYB/RZ./eeD0jICizwHO7lNwyqqMsZ0VPsW2fy', '9687543210', 'shalini1@gmail.com', 'staff', 9999, '', ''),
+(18, 'admin1', '$2y$10$tSWJabkfEiZ38TvUAnKzCe70sIuqJ2I7NUhFhn/Kj8NOMBlnCsC3u', '09483254285', 'admin@mail.com', 'admin', 9999, '', ''),
+(36, 'sindhu3', '$2y$10$2PJ/0zIHPlS.VSrL9edhg.f53d76QZEhf8ocrhGIbfEHRAyXSafla', '9876543214', 'sin@gmial.com', 'student', 0, 'motherMaidenName', 'john'),
+(37, 'ananya', '$2y$10$06Ko.pJL7i7FymL3ku/XWeZmBQWVQT3duAPOUizkrLv/WaSr5tZJO', '9876453219', 'a@gmail.com', 'student', 0, 'firstSchool', 'dharwad');
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `admins`
+--
+ALTER TABLE `admins`
+  ADD CONSTRAINT `fkad` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Constraints for table `marks`
+--
+ALTER TABLE `marks`
+  ADD CONSTRAINT `fkresult` FOREIGN KEY (`std_id`) REFERENCES `students` (`std_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Constraints for table `results`
+--
+ALTER TABLE `results`
+  ADD CONSTRAINT `fkrs` FOREIGN KEY (`std_id`) REFERENCES `students` (`std_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Constraints for table `staff`
+--
+ALTER TABLE `staff`
+  ADD CONSTRAINT `fkst` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Constraints for table `students`
+--
+ALTER TABLE `students`
+  ADD CONSTRAINT `fks` FOREIGN KEY (`id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Constraints for table `subjects`
+--
+ALTER TABLE `subjects`
+  ADD CONSTRAINT `fkstf` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`staff_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -1,0 +1,38 @@
+/* Dark Theme Styles */
+body.dark-theme {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+body.dark-theme header {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+body.dark-theme #sidebar-placeholder {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+body.dark-theme .selection-container {
+    background-color: #2c2c2c;
+    color: #ffffff;
+}
+
+body.dark-theme table {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+body.dark-theme th {
+    background-color: #333333;
+    color: #ffffff;
+}
+
+body.dark-theme tr:nth-child(even) {
+    background-color: #2c2c2c;
+}
+
+body.dark-theme tr:hover {
+    background-color: #3c3c3c;
+}

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Overall Analysis</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      background-color: #f5f7fa;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background-color: #303032;
+      color: #f5f0f0;
+      height: 70px;
+      padding: 0 20px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+    }
+
+    .header a {
+      color: #f5f0f0;
+      text-decoration: none;
+      font-size: 22px;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 30px;
+      width: calc(100% - 220px);
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-content.expanded {
+      margin-left: 50px;
+      width: calc(100% - 50px);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .controls select,
+    .controls button {
+      padding: 8px 12px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .controls button {
+      background-color: #50dd0a;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background-color: #3bb200;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    .chart-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .chart-box {
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .chart-box:last-child {
+      margin-right: 0;
+    }
+
+    canvas {
+      width: 100%;
+      height: 300px;
+    }
+
+    /* --------- TABLE STYLING (ADDED) --------- */
+    .results-table{
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .results-table th, table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    .results-table th {
+      background-color: #f0f0f0;
+    }
+
+    .results-table tbody tr:hover {
+      background-color: #f1f1f1;
+      cursor: pointer;
+    }
+  
+  </style>
+</head>
+<body>
+
+  <!-- Placeholder for Sidebar -->
+  <div id="sidebar-placeholder"></div>
+
+  <main class="main-content">
+    <div class="header">
+      <h1>Overall Analysis</h1>
+      <a href="admin.html" title="Go to Home"><i class="fas fa-home"></i></a>
+    </div>
+
+    <div class="controls">
+      <select id="classSelect">
+        <option value="">Select Class</option>
+        <option value="8">Class 8</option>
+        <option value="9">Class 9</option>
+        <option value="10">Class 10</option>
+      </select>
+      <button onclick="viewResults()">View</button>
+    </div>
+
+    <!-- Student Results Card -->
+    <div class="card" id="studentResultsCard">
+      <h3>Student Results</h3>
+      <table id="studentTable" class="results-table">
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Class</th>
+            <th>Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="4" style="text-align:center; color:#aaa;">No data yet. Please select a class and click view.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+
+
+    <!-- Charts -->
+    <div class="chart-container">
+      <div class="chart-box">
+        <h4>Overall School Percentage</h4>
+        
+        <canvas id="percentageChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h4>Passed vs Failed</h4>
+        <canvas id="gradeChart"></canvas>
+       <!-- <div>
+            <h4>Result Overview</h4>
+            <p>Total Passed Boys: <span id="passedBoys">0</span></p>
+            <p>Total Passed Girls: <span id="passedGirls">0</span></p>
+            <p>Total Failed Boys: <span id="failedBoys">0</span></p>
+            <p>Total Failed Girls: <span id="failedGirls">0</span></p>
+            <p>Overall Percentage: <span id="overallPercentage">0%</span></p>
+          </div>-->
+          
+          <canvas id="percentageChart" width="400" height="400"></canvas>
+          <canvas id="gradeChart" width="400" height="400"></canvas>
+          
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    fetch('sidebar.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('sidebar-placeholder').innerHTML = data;
+      });
+
+      
+let pieChart, barChart;
+
+function viewResults() {
+    const classVal = document.getElementById("classSelect").value;
+    if (!classVal) {
+        alert("Please select a class!");
+        return;
+    }
+
+    fetch(`adminoverall.php?class=${classVal}`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.querySelector("#studentTable tbody");
+            tbody.innerHTML = "";
+            if (data.students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4">No students found</td></tr>`;
+            } else {
+                data.students.forEach(std => {
+                    tbody.innerHTML += `<tr>
+                        <td>${std.std_id}</td>
+                        <td>${std.full_name}</td>
+                        <td>${std.class}</td>
+                        <td>${std.percentage}%</td>
+                    </tr>`;
+                });
+            }
+
+            drawCharts(data);
+        })
+        .catch(err => alert("Error: " + err));
+}
+
+function drawCharts(data) {
+    if (pieChart) pieChart.destroy();
+    if (barChart) barChart.destroy();
+
+    const ctxPie = document.getElementById("percentageChart").getContext("2d");
+    const ctxBar = document.getElementById("gradeChart").getContext("2d");
+
+    pieChart = new Chart(ctxPie, {
+        type: "pie",
+        data: {
+            labels: ["Passed", "Failed"],
+            datasets: [{
+                data: [data.passedBoys + data.passedGirls, data.failedBoys + data.failedGirls],
+                backgroundColor: ["#29C5F6", "#f44336"]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    barChart = new Chart(ctxBar, {
+        type: "bar",
+        data: {
+            labels: ["Boys", "Girls"],
+            datasets: [
+                {
+                    label: "Passed",
+                    data: [data.passedBoys, data.passedGirls],
+                    backgroundColor: "#29C5F6"
+                },
+                {
+                    label: "Failed",
+                    data: [data.failedBoys, data.failedGirls],
+                    backgroundColor: "#f44336"
+                }
+            ]
+        },
+        options: {
+            scales: {
+              x: { grid: { display: false } },
+              y: { beginAtZero: true, grid: { display: false } }
+            }
+        }
+    });
+}
+</script>
+
+<style>
+#percentageChart {
+    max-width: 200px;
+    max-height: 200px;
+}
+</style>
+
+</body>
+</html>

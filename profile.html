@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .profile-wrapper {
+            width: 90%;
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .top-bar {
+            background: #272829;
+            color: #fff;
+            padding: 15px 30px;
+            text-align: center;
+        }
+        .profile-content {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .profile-sidebar {
+            flex: 1;
+            min-width: 220px;
+            background: #f7f9fc;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .profile-sidebar img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #272829;
+            margin-bottom: 15px;
+        }
+        .profile-sidebar input {
+            margin-top: 10px;
+        }
+        .profile-form {
+            flex: 3;
+            padding: 20px 30px;
+            box-sizing: border-box;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #272829;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #272829;
+            outline: none;
+        }
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .update-btn,
+        .back-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            background-color: #272829;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .update-btn:hover,
+        .back-btn:hover {
+            background-color: #555658;
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .profile-content {
+                flex-direction: column;
+            }
+            .form-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-wrapper">
+        <div class="top-bar">
+            <h2>Edit Profile</h2>
+        </div>
+        <form id="profileForm" class="profile-content" enctype="multipart/form-data">
+            <aside class="profile-sidebar">
+                <img id="profilePreview" alt="Profile Image" class="profile-image">
+
+                <input type="file" id="profileImage" name="profileImage" accept="image/*" onchange="previewImage(event)">
+            </aside>
+            <main class="profile-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" name="fullName">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dob" name="dob">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="academicYear">Academic Year</label>
+                        <input type="text" id="academicYear" name="academicYear">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="parentName">Parent Name</label>
+                        <input type="text" id="parentName" name="parentName">
+                    </div>
+                    <div class="form-group">
+                        <label for="parentPhone">Parent Phone</label>
+                        <input type="tel" id="parentPhone" name="parentPhone">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="hintQn">Hint Question</label>
+                    <select id="hintQn" name="hintQn">
+                        <option value="motherMaidenName">What is your mother's maiden name?</option>
+                        <option value="firstPet">What was the name of your first pet?</option>
+                        <option value="firstSchool">What is the name of your first school?</option>
+                        <option value="other">Other (Please specify)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="customHintContainer" style="display:none;">
+                    <label for="customHint">Custom Hint Question</label>
+                    <input type="text" id="customHint" name="customHint">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hintAns">Hint Answer</label>
+                        <input type="text" id="hintAns" name="hintAns">
+                    </div>
+                    <div class="form-group">
+                        <label for="class">Class</label>
+                        <select id="class" name="class">
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" name="address" rows="3"></textarea>
+                </div>
+                <div class="button-container">
+                    <button type="button" class="update-btn" onclick="updateProfile()">Update Profile</button>
+                    <button type="button" class="back-btn" onclick="goBack()">Back</button>
+                </div>
+            </main>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('hintQn').addEventListener('change', function() {
+    document.getElementById('customHintContainer').style.display =
+        this.value === 'other' ? 'block' : 'none';
+});
+
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+        document.getElementById('profilePreview').src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+function fetchProfile() {
+    fetch('profl.php')
+    .then(response => response.json())
+    .then(data => {
+        // Set input values
+        for (let key in data) {
+            if (document.getElementById(key)) {
+                document.getElementById(key).value = data[key];
+            }
+        }
+
+        // Show custom hint input if needed
+        if (data.hintQn === 'other') {
+            document.getElementById('customHintContainer').style.display = 'block';
+        }
+
+        // Set profile image only if provided
+        if (data.profileImage && data.profileImage.trim() !== '') {
+            document.getElementById('profilePreview').src = 'pictures/resume/' + data.profileImage;
+        }
+        // If no image, do nothing → keeps <img> empty
+    })
+    .catch(() => {
+        alert('Failed to load profile data.');
+    });
+}
+
+function updateProfile() {
+    const form = document.getElementById('profileForm');
+    const formData = new FormData(form);
+    fetch('profl.php', { method: 'POST', body: formData })
+    .then(response => response.text())
+    .then(result => {
+        if (result === 'success') {
+            alert('Profile updated successfully!');
+            window.location.href = 'stddash.html';
+        } else {
+            alert('Failed to update profile! Error: ' + result);
+        }
+    })
+    .catch(() => alert('There was an error updating your profile.'));
+}
+
+function goBack() {
+    window.location.href = 'stddash.html';
+}
+
+window.onload = fetchProfile;
+
+    </script>
+</body>
+</html>

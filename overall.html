@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Overall Analysis</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/dark-theme.css">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        #sidebar-placeholder {
+            width: 220px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 2px solid #333;
+        }
+
+        header .icons {
+            display: flex;
+            align-items: center;
+        }
+
+        header .icons .material-icons {
+            font-size: 24px;
+            margin-left: 15px;
+            cursor: pointer;
+            color: white;
+        }
+
+        header .icons .material-icons:hover {
+            color: #1abc9c;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .selection-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .selection-container select, .selection-container button {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+        }
+
+        .selection-container button {
+            background-color: #3aac0a;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .selection-container button:hover {
+            background-color: #16a085;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .search-container input {
+            padding: 10px 40px 10px 10px;
+            font-size: 16px;
+            width: 250px;
+            border-radius: 30px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            border-color: #3aac0a;
+            box-shadow: 0 0 8px rgba(58, 172, 10, 0.3);
+        }
+
+        .search-container .material-icons {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #080808;
+            cursor: pointer;
+        }
+
+        .search-container button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #3aac0a;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #0c4712;
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto 0;
+            border-collapse: collapse;
+            background: #f9f9f7;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: black;
+        }
+
+        th {
+            background-color: #dff19e;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e0e0e0;
+        }
+
+        .chart-container {
+            width: 70%; /* Adjusted size */
+            height: 10%; /* Reduced height */
+            margin: 0 auto;
+            padding: 1px;
+            background: #f9f9f7;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        canvas {
+            max-width: 700%;
+            height: 10%; /* Reduced height */
+        }
+
+        /* Dark theme adjustments */
+        body.dark-theme table tbody tr, 
+        body.dark-theme table td {
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-placeholder"></div>
+    <div class="content">
+    <header>
+        <div><h2>Overall Analysis</h2></div>
+        <div class="icons">
+            <span class="material-icons" onclick="goHome()">home</span>
+        </div>
+    </header>
+
+        <div class="selection-container">
+            <div>
+                
+                <select id="classSelect">
+                    <option value="">-- Select Class --</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
+                <button onclick="viewData('percentage')">View % Range</button>
+                <button onclick="viewData('grade')">View Grade Result</button>
+                <button onclick="viewData('status')">View Status</button>
+            </div>
+        </div>
+
+        <canvas id="barChart" width="60" height="20"></canvas>
+        
+        <canvas id="statusHistogram"></canvas>
+
+        <table class="student-table" id="dataTable">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+
+        
+
+    </div>
+    <script>
+        fetch('side.html')
+          .then(res => res.text())
+          .then(data => {
+            document.getElementById('sidebar-placeholder').innerHTML = data;
+          });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+        });
+
+        function goHome() {
+            window.location.href = 'staff.html';
+        }
+
+        function viewData(option) {
+            const selectedClass = document.getElementById('classSelect').value;
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'over.php', true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.onload = function () {
+                const data = JSON.parse(this.responseText);
+                populateTable(data, option);
+                generateChart(data, option);
+            };
+            xhr.send('class=' + selectedClass + '&option=' + option);
+        }
+
+        function populateTable(data, option) {
+            const table = document.getElementById('dataTable');
+            const head = document.getElementById('tableHead');
+            const body = document.getElementById('tableBody');
+            head.innerHTML = '';
+            body.innerHTML = '';
+            table.style.display = 'table';
+
+            let columns = '', label = '';
+            if (option === 'percentage') {
+                columns = ['Percentage Range', 'Number of Students'];
+                label = 'range';
+            } else if (option === 'grade') {
+                columns = ['Grade', 'Number of Students'];
+                label = 'grade';
+            } else {
+                columns = ['Status', 'Number of Students'];
+                label = 'status';
+            }
+
+            const headRow = `<tr><th>${columns[0]}</th><th>${columns[1]}</th></tr>`;
+            head.innerHTML = headRow;
+
+            data.forEach(row => {
+                const rowHTML = `<tr><td>${row[label]}</td><td>${row.count}</td></tr>`;
+                body.innerHTML += rowHTML;
+            });
+        }
+
+        let chartInstance;
+        function generateChart(data, option) {
+            const ctx = document.getElementById('barChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            let labels = [], counts = [], colors = [];
+
+            if (option === 'percentage') {
+                labels = data.map(row => row.range);
+                counts = data.map(row => row.count);
+                colors = labels.map(() => '#007BFF'); // green
+            } else if (option === 'grade') {
+                labels = data.map(row => row.grade);
+                counts = data.map(row => row.count);
+                colors = labels.map(() => '#007BFF'); // green
+            } else if (option === 'status') {
+                labels = data.map(row => row.status);
+                counts = data.map(row => row.count);
+                colors = labels.map(status => status === 'Passed' ? '#007BFF' : '#FF4136'); // blue/red
+            }
+
+            // Explicitly set the canvas dimensions to half the page
+            const canvas = document.getElementById('barChart');
+            //canvas.style.width = '5vw'; // 50% of the viewport width
+            //canvas.style.height = '5vh'; // 50% of the viewport height
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Students',
+                        data: counts,
+                        backgroundColor: colors,
+                        barThickness: 50,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    //maintainAspectRatio: false, // Ensure dimensions are respected
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Status'
+                            },
+                            grid: {
+                                display: false // 🔥 disables grid lines on the Y-axis
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: 60, // Reduced the maximum value to decrease Y-axis height
+                            title: {
+                                display: true,
+                                text: 'Number of Students'
+                            },
+                            ticks: {
+                                stepSize: 5 // Adjusted step size for better gap
+                            },
+                            grid: {
+                                display: false // 🔥 disables grid lines on the Y-axis
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            //text: 'Pass vs Fail Status'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

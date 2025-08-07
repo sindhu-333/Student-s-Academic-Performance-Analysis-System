@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Students</title>
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+
+    #sidebar-placeholder {
+      width: 220px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .main-content {
+      margin-left: 240px;
+      padding: 30px;
+      transition: margin-left 0.3s ease;
+    }
+
+    header {
+      background-color: #34495e;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 2px solid #2c3e50;
+    }
+
+    header .icons .material-icons {
+      font-size: 26px;
+      cursor: pointer;
+    }
+
+    header .icons .material-icons:hover {
+      color: #1abc9c;
+    }
+
+    .selection-container {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      background: #ecf0f1;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    select, #viewButton, #searchInput, #searchButton {
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #bdc3c7;
+      padding: 10px;
+      margin: 5px;
+    }
+
+    #viewButton, #searchButton {
+      background-color: #1abc9c;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #viewButton:hover, #searchButton:hover {
+      background-color: #16a085;
+    }
+
+    #searchInput {
+      width: 250px;
+      outline: none;
+      transition: box-shadow 0.3s;
+    }
+
+    #searchInput:focus {
+      box-shadow: 0 0 5px #1abc9c;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: center;
+      font-size: 14px;
+      border-bottom: 1px solid #ecf0f1;
+    }
+
+    th {
+      background-color: #1abc9c;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    /* Dark theme adjustments */
+    body.dark-theme table tbody tr, 
+    body.dark-theme table tr {
+        color: white !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="sidebar-placeholder"></div>
+  <div class="main-content">
+  <header>
+    <div>View Students</div>
+    <div class="icons">
+      <a href="staff.html"><span class="material-icons">home</span></a>
+    </div>
+  </header>
+
+    <div class="selection-container">
+      <div>
+        <select id="classSelect">
+          <option value="">-- Select Class --</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+        <button id="viewButton">View</button>
+      </div>
+
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search by Student ID">
+        <button id="searchButton">Search</button>
+      </div>
+    </div>
+
+    <table id="studentTable">
+      <thead>
+        <tr>
+          <th>Student ID</th>
+          <th>Name</th>
+          <th>Date of Birth</th>
+          <th>Gender</th>
+          <th>Class</th>
+          <th>Year</th>
+          <th>Phone Number</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Student data will come here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Load sidebar
+    fetch('side.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('sidebar-placeholder').innerHTML = data;
+      });
+
+    // Apply theme on page load based on local storage
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+    });
+
+    // Fetch student data
+    // Modify the fetchStudents function
+function fetchStudents(selectedClass = '') {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const url = selectedClass ? `viewstud.php?class=${selectedClass}` : 'viewstud.php'; // If no class, fetch all students
+
+    xhr.open('GET', url, true);
+
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.responseText);
+      } else {
+        reject('Failed to fetch data.');
+      }
+    };
+
+    xhr.onerror = function() {
+      reject('Request error.');
+    };
+
+    xhr.send();
+  });
+}
+
+// Modify the view button click handler to load all students if no class is selected
+document.getElementById('viewButton').addEventListener('click', function() {
+  const selectedClass = document.getElementById('classSelect').value;
+  const table = document.getElementById('studentTable');
+  const tbody = table.querySelector('tbody');
+
+  tbody.innerHTML = '';
+
+  fetchStudents(selectedClass)
+    .then(response => {
+      tbody.innerHTML = response;
+      table.style.display = 'table';
+    })
+    .catch(error => {
+      console.error(error);
+      alert('Something went wrong.');
+    });
+});
+
+// Automatically load all students when the page is loaded (when no class is selected)
+document.addEventListener('DOMContentLoaded', function() {
+  fetchStudents('')
+    .then(response => {
+      const tbody = document.querySelector('#studentTable tbody');
+      tbody.innerHTML = response;
+      document.getElementById('studentTable').style.display = 'table';
+    })
+    .catch(error => {
+      console.error(error);
+    });
+});
+
+    // View button click
+    document.getElementById('viewButton').addEventListener('click', function() {
+      const selectedClass = document.getElementById('classSelect').value;
+      const table = document.getElementById('studentTable');
+      const tbody = table.querySelector('tbody');
+
+      tbody.innerHTML = '';
+
+      fetchStudents(selectedClass)
+        .then(response => {
+          tbody.innerHTML = response;
+          table.style.display = 'table';
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Something went wrong.');
+        });
+    });
+
+    // Search button click
+    document.getElementById('searchButton').addEventListener('click', function() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#studentTable tbody tr');
+
+      rows.forEach(row => {
+        const studentId = row.cells[0].textContent.toLowerCase();
+        if (studentId.includes(searchInput)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
